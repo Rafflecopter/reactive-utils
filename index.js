@@ -35,6 +35,7 @@ module.exports = function (template_or_el, model, options) {
 function partial (Partial) {
   return function (el, property) {
     var partial = new Partial(this.reactive, property)
+    partial._binding = this
     el.parentNode.replaceChild(partial.view.el, el)
   }
 }
