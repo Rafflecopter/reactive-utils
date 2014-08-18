@@ -1,19 +1,22 @@
-var reactive = require('reactive')
+var partials = require('reactive-partials')
   , foreach = require('lodash.foreach')
 
-module.exports = function (template_or_el, model, options) {
-  options = options || {}
-  options.bindings = options.bindings || {}
-  options.bindings['keep-if'] = keepIf
-  options.bindings['remove-if'] = removeIf
+module.exports = function wrap(reactive) {
+  return function (template_or_el, model, options) {
+    options = options || {}
+    options.bindings = options.bindings || {}
+    options.bindings['keep-if'] = keepIf
+    options.bindings['remove-if'] = removeIf
 
-  if (options.partials) {
-    foreach(options.partials, function (View, name) {
-      options.bindings['partial-'+name] = partial(View)
+    // We have a slightly different export syntax than reactive-partials
+    var ptls = options.partials
+      , nptls = options.partials = {}
+    foreach(ptls, function (P, key) {
+      nptls[key] = function (a,b) { return new P(a,b).view.el }
     })
-  }
 
-  return reactive(template_or_el, model, options)
+    return partials(reactive)(template_or_el, model, options)
+  }
 }
 
 
@@ -22,8 +25,8 @@ module.exports = function (template_or_el, model, options) {
 
 /* Our way of doing nested templates.
  *
- *  Example: 
- *      after doing 
+ *  Example:
+ *      after doing
  *          `reactive(tpl, model, {partials: {myPartial: ...}})`
  *      you can then do
  *          `<div partial-myPartial>`
@@ -46,7 +49,7 @@ function partial (Partial) {
  *
  *  Example:
  *      `<span class="profile-data" keep-if="hasProfile">`
- *  
+ *
  */
 function removeIf(el, property) {
   var binding = this
@@ -69,7 +72,7 @@ function removeIf(el, property) {
  *
  *  Example:
  *      `<span class="profile-data" keep-if="hasProfile">`
- *  
+ *
  */
 function keepIf(el, property) {
   var binding = this
@@ -92,7 +95,7 @@ function keepIf(el, property) {
  *
  *  Example:
  *      `<span class="propertyEditor" keep-if-equal="dataType=boolean">`
- *  
+ *
  */
 function keepIfEqual(el, attrVal) {
   var spl = attrVal.split(/ ?= ?/)
