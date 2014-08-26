@@ -57,7 +57,6 @@ function removeIf(el, property) {
 
   binding.change(function() {
     var value = binding.value(property)
-    console.log('keep-if', property, value, el, el.parentNode, parent)
     if (value && el.parentNode) {
       el.parentNode.removeChild(el)
     } else if (value && !el.parentNode) {
@@ -80,7 +79,6 @@ function keepIf(el, property) {
 
   binding.change(function() {
     var value = binding.value(property)
-    console.log('keep-if', property, value, el, el.parentNode, parent)
     if (!value && el.parentNode) {
       el.parentNode.removeChild(el)
     } else if (value && !el.parentNode) {
